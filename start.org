@@ -1,0 +1,81 @@
+* 安装操作系统
+  1. 务必使用与树莓派板相对应的操作系统，可以避免一些莫名的问题。pi1, pi2 用
+     wheezy, pi3 可考虑使用最新的 raspbian。比较完整的镜像资源：http://distrowatch.com/?newsid=08599
+  2. 官网下载镜像 https://www.raspberrypi.org/downloads/raspbian/
+  3. 使用 Win32DiskImager 镜像烧录软件，将镜像烧录到 SD 卡 https://sourceforge.net/projects/win32diskimager/
+  4. sudo apt-get update
+     sudo apt-get upgrade
+     或者使用 sudo rpi-update 来更新系统。
+  5. sudo raspi-config 配置系统。
+     主要是键盘区域设置，这样键盘才能输入特殊字符；Advance 里打开 SSH server.
+  6. 安装远程桌面支持
+     #+BEGIN_SRC sh
+     sudo apt-get install xrdp
+     #+END_SRC
+     #+BEGIN_SRC sh
+     sudo apt-get install tightvncserver
+     #+END_SRC
+* 文件迁移
+  1. 从 win7 向 pi 传送文件
+     下载 WinSCP, 参考链接：
+  [1] https://www.raspberrypi.org/forums/viewtopic.php?f=26&t=34451
+  [2] http://winscp.net/eng/download.php
+  2. 从 linux 向 pi 传送文件
+     安装 filezilla (有 windows 版本): sudo apt-get install filezilla;
+     在终端运行 filezilla, 会出现软件界面，输入正确的 pi 地址，用户名，密码即可。
+* 将 pi 作为一个 FM 发射站
+  1. 下载 PiFm 工程
+     http://www.icrobotics.co.uk/wiki/index.php/Turning_the_Raspberry_Pi_Into_an_FM_Transmitter,
+     参照网页进行配置 
+  2. 安装 ffmpeg
+  使用 sudo apt-get install ffmpeg 的方式无法安装，于是只能编译安装(对于 wheezy 是可
+  以安装的)。linux 中通常
+  在两种情况下需要编译安装，一是默认的安装方式找不到软件，就像 ffmpeg；二是想安装最
+  新版的软件。
+  在 linux 下编译安装软件的步骤如下：
+  - 下载源码
+  - 解压文件
+  - tar.gz 和 tar.bz2 打包软件，大多是通过 ./configure ;make ;make install 来
+    安装的。进入源码目录依次执行 ./configure; make; make install。
+  - 编译中的配置：安装路径 ./configure --prefix=安装路径 
+  - 安装完成后，有的软件需要修改一下 PATH，才能在 shell 中调用其可执行文件。修改 PATH
+    的方法是 vim ~/.bashrc 在文件尾加上一行：PATH=$PATH:路径 1:路径 2 
+  - 音频测试
+  A. python: 
+  sudo python
+  >>> import PiFm
+  >>> PiFm.play_sound("sound.wav")
+
+  B. stereo audio 
+  sudo ./pifm left_right.wav 103.3 22050 stereo 
+  # Example command lines
+  # play an MP3
+  ffmpeg -i input.mp3 -f s16le -ar 22.05k -ac 1 - | sudo ./pifm -
+
+  # Broadcast from a usb microphone (see arecord manual page for config)
+  arecord -d0 -c2 -f S16_LE -r 22050 -twav -D copy | sudo ./pifm -
+
+  C. change frequency
+  sudo ./pifm sound.wav 100.0
+* 音频文件
+  1. 在树莓派上可以用 aplay xxx.wav 来播放测试音频文件
+** aplay 找不同的声卡 
+   命令：aplay -l
+   aplay: device_list:268: no soundcards found...
+   出现这个错误时，可以在/boot/config.txt 中添加一行 dtparam=audio=on 来解决。
+* Pi 与 RTL-SDR
+  下述内容在(pi1, wheezy)、(pi3, Jessi)系统下亲测成功
+  sudo apt­get install ­y  cmake pkg­config libusb­1.0
+  Download the RTL­SDR code from osmocom:
+  git clone git://git.osmocom.org/rtl­sdr.git
+  1.cd rtl­sdr/
+  2.mkdir build
+  3.cd build
+  4.cmake ../ ­DINSTALL_UDEV_RULES=ON
+  5.make
+  6.sudo make install
+  7.sudo ldconfig
+
+* Pi 作为 git 版本服务器
+  参考链接：[[http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/00137583770360579bc4b458f044ce7afed3df579123eca000][廖雪峰官方网站]]
+
