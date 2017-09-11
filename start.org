@@ -79,3 +79,30 @@
 * Pi 作为 git 版本服务器
   参考链接：[[http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/00137583770360579bc4b458f044ce7afed3df579123eca000][廖雪峰官方网站]]
 
+* pi 的 SPI 接口
+http://fanwen.wenku1.com/article/43604138.html
+  串行外围设备接口(SPI)是由Motorola公司开发的、用来在和外围设备芯片之间实现数据交换的低成本、易使用接口。与标准的串行接口不同，SPI是一个同步协议接口，全双工通信，所有的传输都参照一个共同的时钟，这个同步时钟信号由主机产生。接收数据的外设使用时钟对串行比特流的接收进行同步化。其传输速度可达几Mb/s。
+
+  SPI主要使用4个信号：MISO(主机输入/从机输出)、MOSI(主机输出/从机输入)、 SCLK(串行时钟)、或(外设片选或从机选择)。
+
+* pi 入门资料
+
+* 远程桌面
+  先前使用 VNC 连接 pi
+
+  不知道为什么，这种方法失效了。重置密码后可以了：
+
+tightvncserver [[http://itfixed.blogspot.com.es/2009/05/how-to-change-vnc-server-password-on.html][重置密码]]:
+
+在终端输入：
+ vncpassword
+
+进一步输入 新密码（注意是8位） view-only 选择 no。
+
+
+  也可以换成 xrdp, [[http://www.oschina.net/translate/how-to-remote-desktop-raspberry-pi][配置方法]]。
+rdesktop -f -u administrator 192.168.1.55
+-f will start the session full screen (drop this command if you want to view other windows)
+-u allows you to specify the user that will login.
+192.168.1.55 is the server address.
+
