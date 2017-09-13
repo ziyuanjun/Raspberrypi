@@ -106,3 +106,7 @@ rdesktop -f -u administrator 192.168.1.55
 -u allows you to specify the user that will login.
 192.168.1.55 is the server address.
 
+#+BEGIN_SRC sh
+rdesktop -u pi 192.168.21.101
+#+END_SRC
+

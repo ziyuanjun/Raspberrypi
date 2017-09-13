@@ -1,0 +1,95 @@
+# -*- eval: (setq org-download-image-dir (file-name-sans-extension (buffer-name))); -*-
+# -*- org-export-babel-evaluate: nil; -*-
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../orgstyle.css"/>
+#+OPTIONS: ':nil *:t -:t ::t <:t H:3 \n:t arch:headline author:t c:nil S:nil -:nil
+#+OPTIONS: creator:nil d:(not "En") date:t e:t email:nil f:t inline:t
+#+OPTIONS: num:t p:nil pri:nil prop:nil stat:t tags:t tasks:t tex:t timestamp:t
+#+OPTIONS: title:t toc:t todo:t |:t 
+#+OPTIONS: ^:{}
+#+LATEX_CLASS: ctexart
+#+STARTUP: entitiespretty:t
+#+TITLE: 用树梅派上网
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 26.0.50.2 (Org mode 9.0.4)
+
+
+* 终端配置方法
+** 有线
+   编辑配置文件 =/etc/network/interfaces=:
+   #+BEGIN_SRC sh
+   sudo vi /etc/network/interfaces
+   #+END_SRC
+
+   #+BEGIN_EXAMPLE
+   # Include files from /etc/network/interfaces.d:
+   source-directory /etc/network/interfaces.d
+
+   auto lo
+   iface lo inet loopback
+
+   auto eth0
+   iface eth0 inet dhcp
+
+   allow-hotplug wlan0
+   iface wlan0 inet manual
+       wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+   #+END_EXAMPLE
+
+   其中： eth0表示第一个以太网卡  
+
+   iface eth0 inet dhcp表示目前是采用dhcp方式自动获取ip地址。
+
+*** 配置静态IP
+    如需让eth0使用一个静态ip地址你需要对eth0的这一部分做如下修改：
+    将dhcp修改为static并设定其相关ip、子网掩码（必要时再配置网关等信息）：
+    #+BEGIN_EXAMPLE
+    auto eth0
+    iface eth0 inet static
+        address 192.168.1.18    #ip地址
+        subnet 255.255.255.0    #子网掩码
+        network 192.168.1.0     #网络
+        broadcast 192.168.1.255 #广播地址
+        gateway 192.168.1.1     #网关
+    #+END_EXAMPLE
+
+** WiFi
+   配置文件 =/etc/network/interfaces= 中wlan0表示第一个无线网卡。
+
+*** wifi连接配置
+    配置文件：=/etc/wpa_supplicant/wpa_supplicant.conf= ，按下面方式来修改这个配置文件：
+    #+BEGIN_EXAMPLE
+    country=GB
+    ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+    update_config=1
+
+    network={  
+            ssid="SSID名称"  
+            psk="密码"
+    }
+    #+END_EXAMPLE
+    添加一个network={...}，使得树梅派能自动连接上某个wifi 热点。
+    其中，“SSID名称”为wifi网络名称，“密码”为wifi网络连接密码，保存退出即可。
+
+
+*** 配置静态IP
+    必要时，无线连接也能配置静态IP。
+    修改配置文件：=/etc/network/interfaces=:
+    #+BEGIN_EXAMPLE
+    allow-hotplug wlan0  
+    iface wlan0 inet static  
+        address 192.168.1.28    #ip地址
+        subnet 255.255.255.0    #子网掩码
+        network 192.168.1.0     #网络
+        broadcast 192.168.1.255 #广播地址
+        gateway 192.168.1.1     #网关
+    #+END_EXAMPLE
+
+** 使生效
+   修改完配置文件之后，网络状态并没有生效，我们需要执行下面两个命令重启网卡并使其即刻生效：
+   #+BEGIN_SRC sh
+   sudo ifdown eth0 (无线网卡是wlan0)
+   sudo ifup   eth0 (无线网卡是wlan0)
+   #+END_SRC
+
+* 桌面配置方法
